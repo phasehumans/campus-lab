@@ -66,6 +66,54 @@ export const registerUser = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
+    const {email, password} = req.body
+
+    try {
+        const user = await db.user.findUnique({
+            where : {
+                email : email
+            }
+        }) 
+        if(!user){
+            return  res.status(401).json({
+                message : "invalid credentials"
+            })
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if(!isPasswordValid){
+            return res.status(400).json({
+                message : "invalid credentials"
+            })
+        }
+        const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {
+            expiresIn: "7d"
+        })
+    
+        res.cookie('jwt', token, {
+            httpOnly : true,
+            sameSite : "strict",
+            secure : process.env.NODE_ENV !== "development",
+            maxAge : 7 * 24 * 60 * 60 * 1000 // 7 days
+        })
+    
+        res.status(200).json({
+            message : "user logged in successfully",
+            user : {
+                id : user.id,
+                name : user.name,
+                email : user.email,
+                role : user.role
+            }
+        })  
+    
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        res.status(500).json({
+            message : "internal server error",
+            error : error.message
+        })
+    }
+
 }
 
 export const logoutUser = async (req, res) => { 

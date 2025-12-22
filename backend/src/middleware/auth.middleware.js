@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {db} from "../libs/db.js" 
+
 export const authMiddleware = async(req, res, next) => {
     const token = req.cookies.jwt;
 
@@ -30,4 +31,28 @@ export const authMiddleware = async(req, res, next) => {
         res.status(400).json({ message: 'Invalid Token', error: error.message });
     }
 }
-   
+
+// RBAC - Check if user is admin
+export const checkAdmin = (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const user = db.user.findUnique({
+            where : {
+                id : userId
+            },select : {
+                role : true
+            }
+        })
+
+        if(!user || user.role !== 'ADMIN'){
+            return res.status(403).json({
+                message: 'Access Denied: Admins Only'
+            });
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Server Error', error: error.message
+        }); 
+    }
+}

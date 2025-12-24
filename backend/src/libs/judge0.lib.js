@@ -42,3 +42,13 @@ export const submitBatch = async (submissions) => {
 
     return data
 }
+
+export const getJudge0LanguageName = (languageId) => {
+    const languageMap = {
+        71: "Python",
+        63: "JavaScript",
+        54: "C++",
+        62: "Java",
+    }
+    return languageMap[languageId] || "Unknown";
+}

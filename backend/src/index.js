@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.route.js";
 import problemRouter from "./routes/problems.route.js";
 import executionRouter from "./routes/execution.route.js";
 import submissionRouter from "./routes/submission.route.js";
+import playListRouter from "./routes/playlist.route.js";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/problems", problemRouter)
 app.use("/api/v1/code-execution", executionRouter)
 app.use("/api/v1/submission", submissionRouter)
-app.use("/api/v1/playlist", )
+app.use("/api/v1/playlist", playListRouter)
 
 
 

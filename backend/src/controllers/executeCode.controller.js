@@ -1,7 +1,4 @@
-import { memo } from "react";
-import { getJudge0LanguageId, pollBatchResults, submitBatch } from "../libs/judge0.lib";
-import { json } from "express";
-import { all } from "axios";
+import { getJudge0LanguageName, pollBatchResults, submitBatch } from "../libs/judge0.lib";
 import {db} from "../models/db.model.js";
 
 export const executeCode = async (req, res) => {
@@ -120,6 +117,9 @@ export const executeCode = async (req, res) => {
             submission: submissionTestCases,
         });
     } catch (error) {
-        
+        return res.status(500).json({
+            error: "Internal server error",
+            details: error.message,
+        });
     }
 }

@@ -1,4 +1,4 @@
-import { getJudge0LanguageName, pollBatchResults, submitBatch } from "../libs/judge0.lib";
+import { getJudge0LanguageName, pollBatchResults, submitBatch } from "../libs/judge0.lib.js";
 import {db} from "../models/db.model.js";
 
 export const executeCode = async (req, res) => {

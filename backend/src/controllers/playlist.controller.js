@@ -1,4 +1,5 @@
 import {db} from "../libs/db.js"
+import {success, z} from "zod"
 
 export const getAllPlaylist = async (req, res) => {
     try {
@@ -22,7 +23,8 @@ export const getAllPlaylist = async (req, res) => {
         })
     } catch (error) {
         return res.json({
-            message : "server error"
+            success : false,
+            message : "internal server error"
         })
     }
 }
@@ -47,23 +49,43 @@ export const getPlayListDetails = async (req, res) => {
 
         if(!playlist) {
             return res.json({
+                success : false,
                 message : "playlist not found"
             })
         }
 
         return res.json({
+            success : true,
             message : "playlist fetched",
             playlist
         })
+
     } catch (error) {
         return res.json({
-            message : "server error"
+            success : true,
+            message : "internal server error"
         })
     }
 }
 
 export const createPlayList = async (req, res) => {
-    const {name, description} = req.body
+
+    const createPlaylistSchema = z.object({
+        name : z.string(),
+        description : z.string()
+    })
+
+    const parseData = createPlaylistSchema.safeParse(req.body)
+
+    if(!parseData.success){
+        return res.status(400).json({
+            success : true,
+            message : "invalid inputs",
+            errors : parseData.error.flatten()
+        })
+    }
+
+    const {name, description} = parseData.data
     const userId = req.user.id
 
     try {

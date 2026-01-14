@@ -1,6 +1,6 @@
 import {Router} from "express"
-import { executeCode } from "../controllers/executeCode.controller"
-import { authMiddleware } from "../middleware/auth.middleware"
+import { executeCode } from "../controllers/executecode.controller.js"
+import { authMiddleware } from "../middleware/auth.middleware.js"
 
 const executionRouter = Router()
 

@@ -19,12 +19,14 @@ export const getAllPlaylist = async (req, res) => {
         return res.status(200).json({
             success : true,
             message : "playlist fetched",
-            playlists
+            playlists : playlists
         })
+
     } catch (error) {
         return res.json({
             success : false,
-            message : "internal server error"
+            message : "internal server error",
+            error : error.message
         })
     }
 }
@@ -57,19 +59,19 @@ export const getPlayListDetails = async (req, res) => {
         return res.json({
             success : true,
             message : "playlist fetched",
-            playlist
+            playlist : playlist
         })
 
     } catch (error) {
         return res.json({
             success : true,
-            message : "internal server error"
+            message : "internal server error",
+            error : error.message
         })
     }
 }
 
 export const createPlayList = async (req, res) => {
-
     const createPlaylistSchema = z.object({
         name : z.string(),
         description : z.string()
@@ -81,7 +83,7 @@ export const createPlayList = async (req, res) => {
         return res.status(400).json({
             success : true,
             message : "invalid inputs",
-            errors : parseData.error.flatten()
+            errors : parseData.error
         })
     }
 
@@ -91,19 +93,23 @@ export const createPlayList = async (req, res) => {
     try {
         const playlist = await db.playlist.create({
             data : {
-                name,
-                description,
-                userId
+                name : name,
+                description : description,
+                userId : userId
             }
         })
 
         return res.status(200).json({
             success : true,
-            message : "playlist created"
+            message : "playlist created",
+            playlist : playlist
         })
+
     } catch (error) {
         return res.status(500).json({
-            message : "server error"
+            success : false,
+            message : "internal server error",
+            error : error.message
         })
     }
 }
@@ -115,44 +121,53 @@ export const addProblemToPlayList = async (req, res) => {
     try {
         if(!Array.isArray(problemIds) || problemIds.length === 0){
             return res.json({
+                success : false,
                 message : "invalid or missing problemsid"
             })
         }
 
         const problemInPlaylist = await db.playlist.createMany({
             data : problemIds.map((problemId) => ({
-                playlisId, 
-                problemId
+                playlisId : playlisId, 
+                problemId : problemId
             }))
         })
 
         return res.json({
+            success : true,
             message : "problem added in playlist",
-            problemInPlaylist
+            problemInPlaylist : problemInPlaylist
         })
+
     } catch (error) {
         return res.json({
-            message : " internal server error"
+            success : false,
+            message : " internal server error",
+            error : error.message
         })
     }
 }
 
 export const deletePlayList = async (req, res) => {
-    const {playlisId} = req.params
+    const {playlistId} = req.params
     try {
         const deletedPlaylist = await db.playlist.delete({
             where : {
-                id : playlisId
+                id : playlistId
             }
         })
 
         return res.json({
+            success : true,
             message : "playlist deleted",
-            deletedPlaylist
+            deletedPlaylist : deletedPlaylist
         })
+
     } catch (error) {
         return res.json({
-            message : "server error"
+            success : false,
+            message : "internal server error",
+            error : error.message
         })
     }
 }
@@ -164,6 +179,7 @@ export const removeProblemFromPlayList = async (req, res) => {
     try {
         if (!Array.isArray(problemIds) || problemIds.length === 0) {
           return res.json({
+            success : false,
             message: "invalid or missing problemsid",
           });
         }
@@ -178,11 +194,16 @@ export const removeProblemFromPlayList = async (req, res) => {
         })
 
         return res.json({
-            message : "deleted from playlist"
+            success : true,
+            message : "deleted from playlist",
+            deletetedProblem : deletetedProblem
         })
+
     } catch (error) {
         return res.json({
-            message : "server error"
+            success : false,
+            message : "internal server error",
+            error : error.message
         })
     }
 }

@@ -15,10 +15,11 @@ export const getAllSubmissions = async (req, res) => {
             message: "Submissions fetched successfully",
             data: submission
         });
+
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Error fetching submissions",
+            message: "internal server error",
             error: error.message
         });
     }
@@ -41,10 +42,11 @@ export const getSubmissionsById = async (req, res) => {
             message: "Submissions fetched successfully",
             data: submissions
         });
+
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Error fetching submissions",
+            message: "internal server error",
             error: error.message
         });
     }
@@ -67,10 +69,11 @@ export const getSubmissionCountById = async (req, res) => {
             message: "Submission count fetched successfully",
             count : submissionCount
         });
+
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Error fetching submission count",
+            message: "internal server error",
             error: error.message
         });
     }

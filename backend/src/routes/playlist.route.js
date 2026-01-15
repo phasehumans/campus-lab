@@ -1,6 +1,6 @@
 import {Router} from "express"
-import { authMiddleware } from "../middleware/auth.middleware"
-import { addProblemToPlayList, createPlayList, deletePlayList, getAllPlaylist, getPlayListDetails, removeProblemFromPlayList } from "../controllers/playlist.controller"
+import { authMiddleware } from "../middleware/auth.middleware.js"
+import { addProblemToPlayList, createPlayList, deletePlayList, getAllPlaylist, getPlayListDetails, removeProblemFromPlayList } from "../controllers/playlist.controller.js"
 
 const playListRouter = Router()
 

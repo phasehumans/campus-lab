@@ -1,11 +1,38 @@
 import { db } from "../libs/db.js";
 import { getJudge0LanguageId, submitBatch, pollBatchResults } from "../libs/judge0.lib.js";
+import {success, z} from "zod"
 
 export const createProblem = async (req, res) => {
-    const { title, description, difficulty, tags, examples, constraints, testcases, codesnippets, editorial, hints, referneceSolution} = req.body;
+    const createProblemSchema = z.object({
+      title: z.string(),
+      description: z.string(),
+      difficulty: z.string(),
+      tags: z.string(),
+      examples: z.string(),
+      constraints: z.string(),
+      testcases : z.string(),
+      codesnippets : z.string(),
+      editorial : z.string(),
+      hints : z.string(),
+      referneceSolution : z.string()
+    });
+
+
+    const parseData = createProblemSchema.safeParse(req.body)
+
+    if(!parseData.success){
+        return res.status(400).json({
+            success : false,
+            message : "input invalids",
+            error : parseData.error
+        })
+    }
+
+    const {title, description, difficulty, tags, examples, constraints, testcases, codesnippets, editorial, hints, referneceSolution} = parseData.data
 
     if(req.user.role !== "ADMIN"){
         return res.status(403).json({
+            success : false,
             message : "you are not allowed to create problem"
         })
     }
@@ -16,17 +43,18 @@ export const createProblem = async (req, res) => {
     
             if (!languageId) {
                 return res.status(400).json({
-                    message: `Unsupported programming language: ${language}`
+                    success : false,
+                    message : `Unsupported programming language: ${language}`
                 });
             }
     
             const submission = testcases.map(({ input, output }) => ({
-                language_id: languageId,
-                source_code: solutionCode,
-                stdin: input,
-                expected_output: output,
-                cpu_time_limit: 2,
-                memory_limit: 128000,
+                language_id : languageId,
+                source_code : solutionCode,
+                stdin : input,
+                expected_output : output,
+                cpu_time_limit : 2,
+                memory_limit : 128000,
             }));
     
             const submissionResults = await submitBatch(submission)
@@ -48,30 +76,31 @@ export const createProblem = async (req, res) => {
         }
         const newProblem = await db.problem.create({
             data: {
-                title,
-                description,
-                difficulty,
-                tags,
-                examples,
-                constraints,
-                testcases,
-                codesnippets,
-                editorial,
-                hints,
-                referneceSolution,
+                title : title,
+                description : description,
+                difficulty  :difficulty,
+                tags : tags,
+                examples : examples,
+                constraints : constraints,
+                testcases : testcases,
+                codesnippets : codesnippets,
+                editorial : editorial,
+                hints : hints,
+                referneceSolution : referneceSolution,
             },
         });
 
         return res.status(201).json({
-            success: true,
-            message: "Problem created successfully",
-            problem: newProblem,
+            success : true,
+            message : "Problem created successfully",
+            problem : newProblem,
         });
 
     } catch (error) {
         return res.status(500).json({
-            message: "An error occurred while creating the problem",
-            error: error.message,
+            success : false,
+            message : "internal server error",
+            error : error.message,
         });
     }
 }
@@ -82,18 +111,22 @@ export const getAllProblems = async (req, res) => {
 
         if(!problems){
             return res.status(404).json({
-                message: "No problems found",
+                success : false,
+                message : "No problems found",
             });
         }
+
         return res.status(200).json({
-            success: true,
-            message: "Problems fetched successfully",
-            problems,
+            success : true,
+            message : "Problems fetched successfully",
+            problems : problems
         });
+
     } catch (error) {
         return res.status(500).json({
-            message: "An error occurred while fetching problems",
-            error: error.message,
+            success : false,
+            message : "internal server error",
+            error : error.message,
         });
     }
 }
@@ -109,27 +142,53 @@ export const getProblemById = async (req, res) => {
 
         if (!problem) {
             return res.status(404).json({
-                message: "Problem not found",
+                success : false,
+                message : "Problem not found",
             });
         }
 
         return res.status(200).json({
-            success: true,
-            message: "Problem fetched successfully",
-            problem,
+            success : true,
+            message : "Problem fetched successfully",
+            problem : problem,
         });
 
     } catch (error) {
         return res.status(500).json({
-            message: "An error occurred while fetching the problem",
-            error: error.message,
+            success : false,
+            message : "internal server error",
+            error : error.message,
         });
     }
 }
 
 export const updateProblem = async (req, res) => {
+    const updateProblemSchema = z.object({
+        title : z.string(),
+        description : z.string(),
+        difficulty : z.string(),
+        tags : z.string(),
+        examples : z.string(),
+        constraints : z.string(),
+        testcases : z.string(),
+        codesnippets : z.string(),
+        editorial : z.string(),
+        hints : z.string(),
+        referneceSolution : z.string()
+    })
+
+    const parseData = updateProblemSchema.safeParse(req.body)
+
+    if(!parseData.success){
+        return res.status(400).json({
+            success : false,
+            message : "invalid inputs",
+            error : parseData.error
+        })
+    }
+
     const { id } = req.params;
-    const { title, description, difficulty, tags, examples, constraints, testcases, codesnippets, editorial, hints, referneceSolution} = req.body;
+    const { title, description, difficulty, tags, examples, constraints, testcases, codesnippets, editorial, hints, referneceSolution} = parseData.data
 
     const problem = await db.problem.findUnique({
         where: {
@@ -139,6 +198,7 @@ export const updateProblem = async (req, res) => {
 
     if (!problem) {
         return res.status(404).json({
+            success : false,
             message: "Problem not found",
         });
     }
@@ -154,12 +214,12 @@ export const updateProblem = async (req, res) => {
           }
     
           const submission = testcases.map(({ input, output }) => ({
-            language_id: languageId,
-            source_code: solutionCode,
-            stdin: input,
-            expected_output: output,
-            cpu_time_limit: 2,
-            memory_limit: 128000,
+            language_id : languageId,
+            source_code : solutionCode,
+            stdin : input,
+            expected_output : output,
+            cpu_time_limit : 2,
+            memory_limit : 128000,
           }));
     
           const submissionResults = await submitBatch(submission);
@@ -186,17 +246,17 @@ export const updateProblem = async (req, res) => {
                 id: parseInt(id),
             },
             data: {
-                title,
-                description,
-                difficulty,
-                tags,
-                examples,
-                constraints,
-                testcases,
-                codesnippets,
-                editorial,
-                hints,
-                referneceSolution,
+                title : title,
+                description : description,
+                difficulty : difficulty,
+                tags : tags,
+                examples : examples,
+                constraints : constraints,
+                testcases : testcases,
+                codesnippets : codesnippets,
+                editorial : editorial,
+                hints : hints,
+                referneceSolution : referneceSolution,
             },
         });
         return res.status(200).json({
@@ -204,9 +264,11 @@ export const updateProblem = async (req, res) => {
             message: "Problem updated successfully",
             problem: updatedProblem,
         });
+
     } catch (error) {
         return res.status(500).json({
-            message: "An error occurred while updating the problem",
+            success  :false,
+            message: "internal server error",
             error: error.message,
         });
     }
@@ -223,7 +285,8 @@ export const deleteProblem = async (req, res) => {
 
     if (!problem) {
         return res.status(404).json({
-            message: "Problem not found",
+            success : false,
+            message: "Problem not found"
         });
     }
 
@@ -233,13 +296,16 @@ export const deleteProblem = async (req, res) => {
                 id: parseInt(id),
             },
         });
+
         return res.status(200).json({
             success: true,
             message: "Problem deleted successfully",
         });
+
     } catch (error) {
         return res.status(500).json({
-            message: "An error occurred while deleting the problem",
+            success : false,
+            message: "internal server error",
             error: error.message,
         });
     }
@@ -269,10 +335,11 @@ export const getSolvedProblems = async (req, res) => {
             message: "Solved problems fetched successfully",
             data: problems
         });
+
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Error fetching solved problems",
+            message: "internal server error",
             error: error.message
         });
     }

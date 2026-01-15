@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {db} from "../libs/db.js" 
+import { success } from 'zod';
 
 export const authMiddleware = async(req, res, next) => {
     const token = req.cookies.jwt;
@@ -23,12 +24,19 @@ export const authMiddleware = async(req, res, next) => {
         })
 
         if(!user){
-            return  res.status(404).json({ message: 'User Not Found' });
+            return  res.status(404).json({
+                message : 'User Not Found' 
+            });
         }
         req.user = user;
         next();
+
     } catch (error) {
-        res.status(400).json({ message: 'Invalid Token', error: error.message });
+        res.status(400).json({ 
+            success : false,
+            message : 'Invalid Token', 
+            error : error.message 
+        });
     }
 }
 
@@ -46,13 +54,15 @@ export const checkAdmin = (req, res, next) => {
 
         if(!user || user.role !== 'ADMIN'){
             return res.status(403).json({
-                message: 'Access Denied: Admins Only'
+                message : 'Access Denied: Admins Only'
             });
         }
         next();
     } catch (error) {
         return res.status(500).json({
-            message: 'Server Error', error: error.message
+            success : false,
+            message : 'Server Error', 
+            error : error.message
         }); 
     }
 }

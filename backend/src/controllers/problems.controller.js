@@ -1,6 +1,6 @@
 import { db } from "../libs/db.js";
 import { getJudge0LanguageId, submitBatch, pollBatchResults } from "../libs/judge0.lib.js";
-import {success, z} from "zod"
+import {z} from "zod"
 
 export const createProblem = async (req, res) => {
     const createProblemSchema = z.object({

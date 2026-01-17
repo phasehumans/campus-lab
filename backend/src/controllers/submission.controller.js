@@ -1,4 +1,4 @@
-import {db} from "../src/lib/db.js";
+import {db} from "../libs/db.js";
 
 export const getAllSubmissions = async (req, res) => {
     try {

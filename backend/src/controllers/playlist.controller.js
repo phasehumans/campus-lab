@@ -1,5 +1,5 @@
 import {db} from "../libs/db.js"
-import {success, z} from "zod"
+import {z} from "zod"
 
 export const getAllPlaylist = async (req, res) => {
     try {

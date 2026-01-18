@@ -1,7 +1,0 @@
-{
-  "name": "Campus Lab FE",
-  "description": "A premier college-oriented coding platform featuring DSA practice, global contests, real-time coding battles, and AI mock interviews.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
-}

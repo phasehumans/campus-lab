@@ -1,30 +1,49 @@
-import React, {useState} from 'react'
-import {useForm} from 'react-hook-form'
+import React , {useState} from 'react'
+import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Link} from 'react-router-dom'
-import {Code, Eye, EyeOff, Loader2, Lock, Mail} from 'lucide-react'
-import {z} from 'zod'
+import { Link } from 'react-router-dom'
+import {
+  Code,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+} from "lucide-react";
+
+import {z} from "zod";
+import AuthImagePattern from '../components/AuthImagePattern';
+import { useAuthStore } from "../store/useAuthStore";
 
 const SignUpSchema = z.object({
-    email: z.string().email("Enter a valid email"),
-    password: z.string().min(6, "Password must be atleast of 6 characters"),
-    name: z.string().min(3, "Name must be atleast 3 character")
+  email:z.string().email("Enter a valid email"),
+  password:z.string().min(6 , "Password must be atleast of 6 characters"),
+  name:z.string().min(3 , "Name must be atleast 3 character")
 })
 
 const SignUpPage = () => {
-  const [showPassword, setShowPassword] = useState(false)
+
+  const [showPassword , setShowPassword] = useState(false);
+
+  const {signup , isSigninUp} = useAuthStore()
 
   const {
     register,
     handleSubmit,
-    formState:{errors}
+    formState:{errors},
   } = useForm({
     resolver:zodResolver(SignUpSchema)
   })
 
-  const onSubmit = async(data) => {
-    console.log(data)
+  const onSubmit = async (data)=>{
+   try {
+    await signup(data)
+    console.log("signup data" , data)
+   } catch (error) {
+     console.error("SignUp failed:", error);
+   }
   }
+
 
   return (
     <div className='h-screen grid lg:grid-cols-2'>
@@ -162,7 +181,6 @@ const SignUpPage = () => {
       />
     </div>
   )
-  
 }
 
 export default SignUpPage

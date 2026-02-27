@@ -1,84 +1,142 @@
-## Campus Lab
+# Campus Lab
 
-Campus Lab is a competitive programming and coding practice platform that allows users to solve algorithmic problems, track their progress and compete in contests.
+> A comprehensive, college-exclusive DSA learning platform combining problem-solving practice, competitive contests and progress tracking.
 
-### Features
+## Overview
 
-- **User Authentication**: Secure signup/login with JWT tokens and bcrypt password hashing
-- **Problem Bank**: Browse, filter, and solve coding problems with multiple difficulty levels
-- **Code Execution**: Run and test code in multiple programming languages via Judge0 integration
-- **Submissions & Testing**: Submit solutions with automatic test case validation
-- **Progress Tracking**: Track solved problems, submission history and user statistics
-- **Playlists**: Organize problems into custom playlists for structured learning paths
-- **Contest Mode**: Participate in timed coding contests with leaderboards
-- **Admin Dashboard**: Create, update, and manage problems and contests
+Campus Lab addresses critical challenges college students face when learning Data Structures and Algorithms:
 
+- **Limited Access** to diverse, well-curated DSA problems
+- **Lack of Structure** in learning paths by difficulty and topics
+- **No Community** for competitive learning within the academic environment
+- **Insufficient Progress Tracking** for individual learning journeys
+- **Absence** of college-specific platforms
 
-### Project Structure
+Campus Lab solves these problems with three core features:
+
+### 1. Problem Sheet
+
+A comprehensive repository of **100+ DSA problems** organized by:
+
+- Difficulty levels (Easy, Medium, Hard)
+- Data structure types and algorithms
+- Real-time code editor with syntax highlighting
+- Multi-language support (Java, Python, C++, JavaScript)
+
+### 2. Contests
+
+Time-bound competitive programming contests:
+
+- **Weekly contests** with 3-5 problems each
+- Real-time leaderboards with rankings
+- Only college students can participate
+- Post-contest editorials and discussions
+
+### 3. Profile & Progress
+
+Personalized progress dashboard:
+
+- Track solved problems and attempts
+- View contest history and ratings
+- Achievement badges and milestones
+- Topic-wise proficiency scores
+- Learning velocity metrics
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 16+ and npm/yarn
+- PostgreSQL 13+
+- Judge0 API (local Docker or cloud instance)
+
+### Installation
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/phasehumans/campuslab.git
+cd campuslab
+```
+
+2. **Install dependencies**
+
+```bash
+cd backend
+npm install
+```
+
+3. **Setup environment variables**
+
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. **Setup database**
+
+```bash
+# Create database
+createdb campuslab
+
+# Run migrations
+npx prisma migrate dev
+
+# Seed sample data (optional)
+npx prisma db seed
+```
+
+5. **Start Judge0** (see [CONTRIBUTING.md](CONTRIBUTING.md#judge0-setup-guide))
+
+```bash
+docker-compose up -d
+```
+
+6. **Run development server**
+
+```bash
+npm run dev
+```
+
+Server starts at `http://localhost:3000` 
+
+## Project Structure
 
 ```
 campuslab/
-├── backend/
+├── server/                         # Node.js/Express API
 │   ├── src/
-│   │   ├── index.js                 # Entry point
-│   │   ├── controllers/             # Request handlers
-│   │   │   ├── auth.controller.js
-│   │   │   ├── executeCode.controller.js
-│   │   │   ├── problems.controller.js
-│   │   │   ├── submission.controller.js
-│   │   │   └── playlist.controller.js
-│   │   ├── routes/                  # API route definitions
-│   │   ├── middleware/              # Custom middleware (auth, etc.)
-│   │   ├── libs/                    # Utility libraries
-│   │   │   ├── db.js               # Database utilities
-│   │   │   └── judge0.lib.js       # Judge0 integration
-│   │   └── generated/               # Prisma generated client
+│   │   ├── index.ts                # Application entry point
+│   │   ├── controllers/            # Request handlers
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── problems.controller.ts
+│   │   │   ├── submission.controller.ts
+│   │   │   ├── playlist.controller.ts
+│   │   │   └── executeCode.controller.ts
+│   │   ├── routes/                 # API route definitions
+│   │   ├── middleware/             # Auth, validation, error handling
+│   │   ├── types/                  # TypeScript definitions
+│   │   ├── libs/                   # Utility libraries
+│   │   │   ├── db.ts              # Database utilities
+│   │   │   ├── judge0.lib.ts      # Judge0 integration
+│   │   │   └── cache.ts           # Redis caching
+│   │   └── generated/              # Prisma auto-generated
 │   ├── prisma/
-│   │   ├── schema.prisma           # Data models
-│   │   └── migrations/              # Database migrations
+│   │   ├── schema.prisma           # Database schema
+│   │   └── migrations/             # DB migration history
 │   ├── package.json
-│   └── prisma.config.ts
-├── docs/                             # Documentation
-├── api-spec.md                      # API specification
-├── judge0-setup.md                  # Judge0 setup guide
-└── literature-review.md             # Research and references
+│   └── .env.example
+├── docs/                            # Documentation files
+│   ├── 01_Abstract.md
+│   ├── 02_Introduction.md
+│   ├── 03_Literature_Review.md
+│   ├── 04_EDA.md
+│   ├── 05_Project_Planning.md
+│   ├── 06_Result_Discussion.md
+│   └── 07_References.md
+├── ARCHITECTURE.md                  # System architecture
+├── CONTRIBUTING.md                  # Contribution guidelines
+├── LICENSE                          # MIT License
+├── README.md                        # This file
+└── .gitignore
 ```
-
-### Data Models
-
-- **User**: Manages user accounts with roles (ADMIN, USER)
-- **Problem**: Coding problems with descriptions, test cases, and solutions
-- **Submission**: User code submissions tracked with execution results
-- **TestCaseResult**: Granular test case pass/fail results
-- **ProblemSolved**: Tracks which problems users have solved
-- **Playlist**: User-created collections of problems
-- **ProblemPlaylist**: Junction between problems and playlists
-
-
-### Key Endpoints
-
-#### Authentication
-
-- `POST /auth/signup` - Create a new user account
-- `POST /auth/login` - User login
-- `POST /auth/logout` - User logout
-- `GET /auth/getcurrentuser` - Get current user info
-
-#### Problems
-
-- `GET /problems/get-problems` - List all problems with filters
-- `GET /problems/get-problems/:id` - Get problem details
-- `GET /problems/get-solved-problems` - Get user's solved problems
-
-#### Code Execution
-
-- `POST /code-execution` - Run or submit code
-    - Supports run mode (test) and submit mode (final submission)
-- `GET /submission/getallsubmissions` - View all submissions
-- `GET /submission/get-submissions/:problemId` - Get submissions for a problem
-
-#### Playlists
-
-- `POST /playlist/create` - Create a new playlist
-- `GET /playlist/:playlistId` - Get playlist details
-- `POST /playlist/:playlistId/add-problem` - Add problem to playlist
